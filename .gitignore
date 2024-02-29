@@ -54,5 +54,5 @@ sysinfo.txt
 
 # End of https://www.gitignore.io/api/unity
 
-
-Assets\Oculus\Avatar2_SampleAssets
+Assets/Oculus/Avatar2_SampleAssets.meta
+Assets/Oculus/Avatar2_SampleAssets

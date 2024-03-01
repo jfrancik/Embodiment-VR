@@ -29,11 +29,11 @@ public class WalkingController : MonoBehaviour
         Vector3 localHeadSpeed = transform.InverseTransformDirection(headSpeed);
         previousPosition = headTarget.position;
 
-        float previousX = animator.GetFloat("x");
-        float previousY = animator.GetFloat("y");
+        float previousX = animator.GetFloat("BlendX");
+        float previousY = animator.GetFloat("BlendY");
 
-        animator.SetBool("isWalking", localHeadSpeed.magnitude > speedMinimum);
-        animator.SetFloat("x", Mathf.Lerp(previousX, Mathf.Clamp(localHeadSpeed.x, -1, 1), lerpFactor));
-        animator.SetFloat("y", Mathf.Lerp(previousY, Mathf.Clamp(localHeadSpeed.z, -1, 1), lerpFactor));
+        animator.SetBool("IsWalking", localHeadSpeed.magnitude > speedMinimum);
+        animator.SetFloat("BlendX", Mathf.Lerp(previousX, Mathf.Clamp(localHeadSpeed.x, -1, 1), lerpFactor));
+        animator.SetFloat("BlendY", Mathf.Lerp(previousY, Mathf.Clamp(localHeadSpeed.z, -1, 1), lerpFactor));
     }
 }

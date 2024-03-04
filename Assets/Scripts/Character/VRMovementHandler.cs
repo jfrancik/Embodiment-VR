@@ -11,22 +11,23 @@ namespace Character
         public Transform vrHeadTransform;
         public LayerMask canStandLayers;
 
+        public Transform heightSensorTransform;
         public float headSyncSmooth = 100;
 
 
         public float GetCurrentHeight()
         {
-            var ray = new Ray(vrHeadTransform.position, Vector3.down);
+            var ray = new Ray(heightSensorTransform.position, Vector3.down);
             var hits = new RaycastHit[5];
             var hitCount = Physics.RaycastNonAlloc(ray, hits, standingHeight + 3f, canStandLayers);
             if (hitCount > 0)
             {
-                Debug.DrawRay(vrHeadTransform.position, Vector3.down *  hits[0].distance);
+                Debug.DrawRay(heightSensorTransform.position, Vector3.down *  hits[0].distance);
                 return hits[0].distance;
             }
             else
             {
-                Debug.LogError("PLAYER IS IN THE AIR!");
+                // Debug.LogError("PLAYER IS IN THE AIR!");
                 return -1f;
             }
         }
@@ -38,8 +39,8 @@ namespace Character
                 var vrHeadCurrentPos = vrHeadTransform.position;
                 if (!Mathf.Approximately(currentHeight, standingHeight))
                 {
-                    var targetPos = new Vector3(vrHeadCurrentPos.x, (vrHeadCurrentPos.y-currentHeight) +  standingHeight  , vrHeadCurrentPos.z);
-                    Debug.LogWarning("Dist:" +  (currentHeight) + " Target: " + standingHeight);
+                    var targetPos = new Vector3(vrHeadCurrentPos.x, (standingHeight-currentHeight) +   vrHeadCurrentPos.y , vrHeadCurrentPos.z);
+                    // Debug.LogWarning("Dist:" +  (currentHeight) + " Target: " + standingHeight);
                     vrHeadTransform.position =  Vector3.Lerp(vrHeadCurrentPos, targetPos, Time.deltaTime * headSyncSmooth);
                 }
             }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using UnityEngine;
 
 namespace Character
@@ -30,7 +31,7 @@ namespace Character
             print("STOP MOVING FORWARD");
             _isMovingForward = false;
         }
-
+        
         public float GetCurrentHeight()
         {
             var ray = new Ray(heightSensorTransform.position, Vector3.down);
@@ -38,8 +39,20 @@ namespace Character
             var hitCount = Physics.RaycastNonAlloc(ray, hits, standingHeight + 3f, canStandLayers);
             if (hitCount > 0)
             {
+                // print(hitCount);
+                // print(hits[0].distance);
                 Debug.DrawRay(heightSensorTransform.position, Vector3.down * hits[0].distance);
-                return hits[0].distance;
+                var minDist = Mathf.Infinity;
+                for (int i = 0; i < hitCount; i++)
+                {
+                    if (hits[i].distance < minDist)
+                    {
+                        minDist = hits[i].distance;
+                    }
+                    
+                }
+
+                return minDist;
             }
             else
             {
@@ -68,7 +81,6 @@ namespace Character
                 {
                     var targetPos = new Vector3(vrHeadCurrentPos.x,
                         (standingHeight - currentHeight) + vrHeadCurrentPos.y, vrHeadCurrentPos.z);
-                    // Debug.LogWarning("Dist:" +  (currentHeight) + " Target: " + standingHeight);
                     vrHeadTransform.position =
                         Vector3.Lerp(vrHeadCurrentPos, targetPos, Time.deltaTime * headSyncSmooth);
                 }

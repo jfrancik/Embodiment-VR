@@ -10,9 +10,9 @@ public class VRSkeletonJointFollower : MonoBehaviour
 
     private void LateUpdate()
     {
-       // transform.position = skeleton.Bones[(int)boneId].Transform.position;
+       if((int)boneId >= skeleton.Bones.Count)
+           return;
        var targetTransform = skeleton.Bones[(int)boneId].Transform;
-       // transform.position = targetTransform.TransformPoint(VRIKSettings.Instance.PositionOffset);
        transform.rotation = targetTransform.rotation * Quaternion.Euler(VRIKSettings.Instance.rotationOffset);
     }
 }

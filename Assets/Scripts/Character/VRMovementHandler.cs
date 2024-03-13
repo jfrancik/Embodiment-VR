@@ -13,7 +13,23 @@ namespace Character
 
         public Transform heightSensorTransform;
         public float headSyncSmooth = 100;
+        public Transform cameraLookTransform;
 
+        private bool _isMovingForward = false;
+
+        private Vector3 _currentMovement;
+
+        public void MoveForward()
+        {
+            print("MOVING FORWARD");
+            _isMovingForward = true;
+        }
+
+        public void StopMoveForward()
+        {
+            print("STOP MOVING FORWARD");
+            _isMovingForward = false;
+        }
 
         public float GetCurrentHeight()
         {
@@ -22,7 +38,7 @@ namespace Character
             var hitCount = Physics.RaycastNonAlloc(ray, hits, standingHeight + 3f, canStandLayers);
             if (hitCount > 0)
             {
-                Debug.DrawRay(heightSensorTransform.position, Vector3.down *  hits[0].distance);
+                Debug.DrawRay(heightSensorTransform.position, Vector3.down * hits[0].distance);
                 return hits[0].distance;
             }
             else
@@ -31,17 +47,30 @@ namespace Character
                 return -1f;
             }
         }
+
+        public float speed = 1;
+
         private void FixedUpdate()
         {
-            var currentHeight = GetCurrentHeight(); 
+            var vrHeadCurrentPos = vrHeadTransform.position;
+            if (_isMovingForward)
+            {
+                _currentMovement = Vector3.Scale(cameraLookTransform.forward, new Vector3(1, 0, 1)).normalized;
+                vrHeadCurrentPos =
+                    Vector3.Lerp(vrHeadCurrentPos, vrHeadCurrentPos + _currentMovement, Time.deltaTime * speed);
+                vrHeadTransform.position = vrHeadCurrentPos;
+            }
+
+            var currentHeight = GetCurrentHeight();
             if (isStanding && currentHeight > 0)
             {
-                var vrHeadCurrentPos = vrHeadTransform.position;
                 if (!Mathf.Approximately(currentHeight, standingHeight))
                 {
-                    var targetPos = new Vector3(vrHeadCurrentPos.x, (standingHeight-currentHeight) +   vrHeadCurrentPos.y , vrHeadCurrentPos.z);
+                    var targetPos = new Vector3(vrHeadCurrentPos.x,
+                        (standingHeight - currentHeight) + vrHeadCurrentPos.y, vrHeadCurrentPos.z);
                     // Debug.LogWarning("Dist:" +  (currentHeight) + " Target: " + standingHeight);
-                    vrHeadTransform.position =  Vector3.Lerp(vrHeadCurrentPos, targetPos, Time.deltaTime * headSyncSmooth);
+                    vrHeadTransform.position =
+                        Vector3.Lerp(vrHeadCurrentPos, targetPos, Time.deltaTime * headSyncSmooth);
                 }
             }
         }

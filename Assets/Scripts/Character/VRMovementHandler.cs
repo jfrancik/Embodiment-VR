@@ -22,19 +22,22 @@ namespace Character
 
 
         public float turningAxis = 0;
+
         public void TurnRight()
         {
             turningAxis = 1f;
         }
+
         public void TurnLeft()
         {
             turningAxis = -1f;
         }
+
         public void StopTurning()
         {
             turningAxis = 0f;
         }
-       
+
         public void MoveForward()
         {
             print("MOVING FORWARD");
@@ -46,7 +49,37 @@ namespace Character
             print("STOP MOVING FORWARD");
             _isMovingForward = false;
         }
-        
+
+        public float forwardIntersectDistance = 1;
+
+        public Vector3 GetForwardWithWalls()
+        {
+            var ray = new Ray(cameraLookTransform.position, cameraLookTransform.forward);
+            var hits = new RaycastHit[5];
+            var hitCount = Physics.RaycastNonAlloc(ray, hits, forwardIntersectDistance, canStandLayers);
+            if (hitCount > 0)
+            {
+                // print(hitCount);
+                // print(hits[0].distance);
+                Debug.DrawRay(heightSensorTransform.position, cameraLookTransform.forward * hits[0].distance);
+                var minHit = hits[0];
+                for (int i = 1; i < hitCount; i++)
+                {
+                    if (hits[i].distance < minHit.distance)
+                    {
+                        minHit = hits[i];
+                    }
+                }
+
+                return Vector3.Project(cameraLookTransform.forward , Vector3.Cross(Vector3.up, minHit.normal).normalized);
+            }
+            else
+            {
+                // Debug.LogError("PLAYER IS IN THE AIR!");
+                return cameraLookTransform.forward;
+            }
+        }
+
         public float GetCurrentHeight()
         {
             var ray = new Ray(heightSensorTransform.position, Vector3.down);
@@ -64,7 +97,6 @@ namespace Character
                     {
                         minDist = hits[i].distance;
                     }
-                    
                 }
 
                 return minDist;
@@ -83,7 +115,7 @@ namespace Character
             var vrHeadCurrentPos = vrHeadTransform.position;
             if (_isMovingForward)
             {
-                _currentMovement = Vector3.Scale(cameraLookTransform.forward, new Vector3(1, 0, 1)).normalized;
+                _currentMovement = Vector3.Scale(GetForwardWithWalls(), new Vector3(1, 0, 1)).normalized;
                 vrHeadCurrentPos =
                     Vector3.Lerp(vrHeadCurrentPos, vrHeadCurrentPos + _currentMovement, Time.deltaTime * speed);
                 vrHeadTransform.position = vrHeadCurrentPos;
@@ -100,8 +132,8 @@ namespace Character
                         Vector3.Lerp(vrHeadCurrentPos, targetPos, Time.deltaTime * headSyncSmooth);
                 }
             }
-            
-            if(Mathf.Abs(turningAxis) > Mathf.Epsilon)
+
+            if (Mathf.Abs(turningAxis) > Mathf.Epsilon)
             {
                 vrHeadTransform.Rotate(Vector3.up, turningAxis * Time.fixedDeltaTime * 45);
             }

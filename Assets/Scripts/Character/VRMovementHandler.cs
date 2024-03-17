@@ -20,6 +20,21 @@ namespace Character
 
         private Vector3 _currentMovement;
 
+
+        public float turningAxis = 0;
+        public void TurnRight()
+        {
+            turningAxis = 1f;
+        }
+        public void TurnLeft()
+        {
+            turningAxis = -1f;
+        }
+        public void StopTurning()
+        {
+            turningAxis = 0f;
+        }
+       
         public void MoveForward()
         {
             print("MOVING FORWARD");
@@ -84,6 +99,11 @@ namespace Character
                     vrHeadTransform.position =
                         Vector3.Lerp(vrHeadCurrentPos, targetPos, Time.deltaTime * headSyncSmooth);
                 }
+            }
+            
+            if(Mathf.Abs(turningAxis) > Mathf.Epsilon)
+            {
+                vrHeadTransform.Rotate(Vector3.up, turningAxis * Time.fixedDeltaTime * 45);
             }
         }
     }

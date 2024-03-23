@@ -103,8 +103,8 @@ namespace Character
             }
             else
             {
-                // Debug.LogError("PLAYER IS IN THE AIR!");
-                return -1f;
+                Debug.LogError("PLAYER IS IN THE AIR!");
+                return standingHeight * 2;
             }
         }
 

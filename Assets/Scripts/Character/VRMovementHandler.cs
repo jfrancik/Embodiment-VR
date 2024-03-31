@@ -15,6 +15,7 @@ namespace Character
         public Transform heightSensorTransform;
         public float headSyncSmooth = 100;
         public Transform cameraLookTransform;
+        public Transform forwardWallSensor;
 
         private bool _isMovingForward = false;
 
@@ -54,14 +55,12 @@ namespace Character
 
         public Vector3 GetForwardWithWalls()
         {
-            var ray = new Ray(cameraLookTransform.position, cameraLookTransform.forward);
+            var ray = new Ray(forwardWallSensor.position, forwardWallSensor.forward);
             var hits = new RaycastHit[5];
             var hitCount = Physics.RaycastNonAlloc(ray, hits, forwardIntersectDistance, canStandLayers);
             if (hitCount > 0)
             {
-                // print(hitCount);
-                // print(hits[0].distance);
-                Debug.DrawRay(heightSensorTransform.position, cameraLookTransform.forward * hits[0].distance);
+                Debug.DrawRay(forwardWallSensor.position, forwardWallSensor.forward * hits[0].distance);
                 var minHit = hits[0];
                 for (int i = 1; i < hitCount; i++)
                 {
@@ -71,7 +70,7 @@ namespace Character
                     }
                 }
 
-                return Vector3.Project(cameraLookTransform.forward , Vector3.Cross(Vector3.up, minHit.normal).normalized);
+                return Vector3.Project(forwardWallSensor.forward , Vector3.Cross(Vector3.up, minHit.normal).normalized);
             }
             else
             {

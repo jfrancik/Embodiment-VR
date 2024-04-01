@@ -21,6 +21,7 @@ namespace Character
 
         private Vector3 _currentMovement;
 
+        public bool IsClimbing = false;
 
         public float turningAxis = 0;
 
@@ -111,6 +112,8 @@ namespace Character
 
         private void FixedUpdate()
         {
+            if(IsClimbing)
+                return;
             var vrHeadCurrentPos = vrHeadTransform.position;
             if (_isMovingForward)
             {

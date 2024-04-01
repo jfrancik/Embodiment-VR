@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Character;
 using DefaultNamespace.DesignPatterns;
 using Gym;
 using UnityEngine;
@@ -10,7 +11,7 @@ public class VRGrabHandler : MonoSingleton<VRGrabHandler>
 {
     private Dictionary<FingerColliderType, KeyValuePair<HandFingerCollider, Pickable>> collidersPlacements;
     public Transform handTransform;
-
+    public VRMovementHandler movementHandler;
     private void Start()
     {
         collidersPlacements = new Dictionary<FingerColliderType, KeyValuePair<HandFingerCollider, Pickable>>();
@@ -25,25 +26,50 @@ public class VRGrabHandler : MonoSingleton<VRGrabHandler>
         }
     }
 
-    private Pickable _currentPickable = null;
-    private bool _isHandOpen;
+    private Pickable _currentPickableLeft = null;
+    private Pickable _currentPickableRight = null;
+    private bool _isLeftHandOpen;
+    private bool _isRightHandOpen;
 
-    public void OnHandOpenDeActive()
+    private void Update()
     {
-        _isHandOpen = false;
-        Debug.LogError("HAND NOT OPEN");
+        if (_currentPickableLeft != null || _currentPickableRight != null)
+        {
+            movementHandler.IsClimbing = true;
+        }
+        else
+        {
+            movementHandler.IsClimbing = false;
+        }
     }
 
-    public void OnHandOpenActive()
+    public void OnLeftHandOpenDeActive()
     {
-        _isHandOpen = true;
-        if (_currentPickable != null)
-        {
-            _currentPickable.Release();
-            _currentPickable = null;
-        }
+        _isLeftHandOpen = false;
+    }
 
-        Debug.LogError("HAND OPEN");
+    public void OnLeftHandOpenActive()
+    {
+        _isLeftHandOpen = true;
+        if (_currentPickableLeft != null)
+        {
+            _currentPickableLeft.Release();
+            _currentPickableLeft = null;
+        }
+    }
+    public void OnRightHandOpenDeActive()
+    {
+        _isRightHandOpen = false;
+    }
+
+    public void OnRightHandOpenActive()
+    {
+        _isRightHandOpen = true;
+        if (_currentPickableRight != null)
+        {
+            _currentPickableRight.Release();
+            _currentPickableRight = null;
+        }
     }
 
     public void AddFingerForPickable(HandFingerCollider fingerCollider, Pickable pickable)
@@ -53,19 +79,38 @@ public class VRGrabHandler : MonoSingleton<VRGrabHandler>
 
         PrintColliders();
 
-        if (IsPickablePicked(pickable) && _currentPickable == null)
+        if (IsPickablePickedRight(pickable))
         {
-            _currentPickable = pickable;
+            _currentPickableRight = pickable;
+            pickable.SnapToHand(collidersPlacements.Where(cp => cp.Value.Value.Equals(pickable)
+            ).Select(cp => cp.Value.Key.transform).ToList());
+        }
+        else if(IsPickablePickedLeft(pickable))
+        {
+            _currentPickableLeft = pickable;
             pickable.SnapToHand(collidersPlacements.Where(cp => cp.Value.Value.Equals(pickable)
             ).Select(cp => cp.Value.Key.transform).ToList());
         }
     }
 
-    public bool IsPickablePicked(Pickable pickable)
+    public bool IsPickablePickedRight(Pickable pickable)
     {
-        return !_isHandOpen && pickable.typesNeededToPick.TrueForAll(type =>
-            collidersPlacements.ContainsKey(type) && collidersPlacements[type].Value.Equals(pickable)
-        );
+        var isRightPickable = !_isRightHandOpen && _currentPickableRight == null &&
+                              pickable.typesNeededToPickRight.TrueForAll(type =>
+                                  collidersPlacements.ContainsKey(type) &&
+                                  collidersPlacements[type].Value.Equals(pickable)
+                              );
+        return isRightPickable;
+    }
+
+    public bool IsPickablePickedLeft(Pickable pickable)
+    {
+        var isLeftPickable = !_isLeftHandOpen && _currentPickableLeft == null &&
+                              pickable.typesNeededToPickLeft.TrueForAll(type =>
+                                  collidersPlacements.ContainsKey(type) &&
+                                  collidersPlacements[type].Value.Equals(pickable)
+                              );
+        return isLeftPickable;
     }
 
     public void ReleaseFingerForPickable(FingerColliderType colliderType)

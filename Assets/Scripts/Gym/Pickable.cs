@@ -9,8 +9,20 @@ namespace Gym
         private Vector3 _offset;
         private List<Transform> _fingersTransforms = new List<Transform>();
         private bool isSnapped = false;
-        public List<FingerColliderType> typesNeededToPick;
+        public List<FingerColliderType> typesNeededToPickLeft;
+        public List<FingerColliderType> typesNeededToPickRight;
         public Rigidbody rb;
+        public bool isMovable = true;
+
+        public Color defaultColor = Color.white;
+        
+        public Color snapColor = Color.green;
+        private MeshRenderer _meshRenderer;
+
+        private void Start()
+        {
+            _meshRenderer = GetComponent<MeshRenderer>();
+        }
 
         private Vector3 FindMedianOfFingers()
         {
@@ -23,14 +35,24 @@ namespace Gym
         }
         public void Release()
         {
-            rb.isKinematic = false;
+            _meshRenderer.material.color = defaultColor;
+            if (isMovable)
+            {
+                
+                rb.isKinematic = false;
+            }
 
             isSnapped = false;
         }
         public void SnapToHand(List<Transform> fingersTransforms)
         {
+            _meshRenderer.material.color = snapColor;
             _fingersTransforms = fingersTransforms;
-            rb.isKinematic = true;
+            if (isMovable)
+            {
+                
+                rb.isKinematic = true;
+            }
             // Debug.LogError( $"Count: {fingersTransforms.Count} / Median: " + FindMedianOfFingers() );
             _offset = transform.position - FindMedianOfFingers();
             isSnapped = true;
@@ -40,7 +62,19 @@ namespace Gym
         {
             if (isSnapped)
             {
-                transform.position = FindMedianOfFingers() + _offset;
+                if(isMovable)
+                    transform.position = FindMedianOfFingers() + _offset;
+                else
+                {
+                    var newPos = FindMedianOfFingers() + _offset;
+                    var movement = newPos - transform.position ;
+                    GymEnv.Instance.MoveEnv(movement, gameObject.GetInstanceID());
+                }
+            }
+            else if(!isMovable)
+            {
+                GymEnv.Instance.StopEnv(gameObject.GetInstanceID());
+
             }
         }
     }

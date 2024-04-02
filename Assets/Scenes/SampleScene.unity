@@ -568,6 +568,8 @@ MonoBehaviour:
   typesNeededToPickRight: 0300000001000000
   rb: {fileID: 0}
   isMovable: 0
+  defaultColor: {r: 1, g: 1, b: 1, a: 1}
+  snapColor: {r: 0, g: 1, b: 0, a: 1}
 --- !u!65 &98794353
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -932,6 +934,8 @@ MonoBehaviour:
   typesNeededToPickRight: 0300000001000000
   rb: {fileID: 0}
   isMovable: 0
+  defaultColor: {r: 1, g: 1, b: 1, a: 1}
+  snapColor: {r: 0, g: 1, b: 0, a: 1}
 --- !u!65 &217561579
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1409,7 +1413,7 @@ Transform:
   m_GameObject: {fileID: 278131619}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -1.1333332, y: 1.2, z: -5.533334}
+  m_LocalPosition: {x: -1, y: 1.2, z: -5.533334}
   m_LocalScale: {x: 0.13333334, y: 0.13333334, z: 0.13333334}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1431,6 +1435,8 @@ MonoBehaviour:
   typesNeededToPickRight: 0100000003000000
   rb: {fileID: 278131621}
   isMovable: 1
+  defaultColor: {r: 1, g: 1, b: 1, a: 1}
+  snapColor: {r: 0, g: 1, b: 0, a: 1}
 --- !u!1 &303858697
 GameObject:
   m_ObjectHideFlags: 0
@@ -3493,6 +3499,8 @@ MonoBehaviour:
   typesNeededToPickRight: 0300000001000000
   rb: {fileID: 0}
   isMovable: 0
+  defaultColor: {r: 1, g: 1, b: 1, a: 1}
+  snapColor: {r: 0, g: 1, b: 0, a: 1}
 --- !u!65 &548069835
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -3796,6 +3804,8 @@ MonoBehaviour:
   typesNeededToPickRight: 0300000001000000
   rb: {fileID: 0}
   isMovable: 0
+  defaultColor: {r: 1, g: 1, b: 1, a: 1}
+  snapColor: {r: 0, g: 1, b: 0, a: 1}
 --- !u!65 &653780072
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -3940,6 +3950,8 @@ MonoBehaviour:
   typesNeededToPickRight: 0300000001000000
   rb: {fileID: 0}
   isMovable: 0
+  defaultColor: {r: 1, g: 1, b: 1, a: 1}
+  snapColor: {r: 0, g: 1, b: 0, a: 1}
 --- !u!65 &684960168
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -4784,6 +4796,8 @@ MonoBehaviour:
   typesNeededToPickRight: 0300000001000000
   rb: {fileID: 0}
   isMovable: 0
+  defaultColor: {r: 1, g: 1, b: 1, a: 1}
+  snapColor: {r: 0, g: 1, b: 0, a: 1}
 --- !u!65 &879405766
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -5361,6 +5375,8 @@ MonoBehaviour:
   typesNeededToPickRight: 0300000001000000
   rb: {fileID: 0}
   isMovable: 0
+  defaultColor: {r: 1, g: 1, b: 1, a: 1}
+  snapColor: {r: 0, g: 1, b: 0, a: 1}
 --- !u!65 &944885773
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -6035,6 +6051,8 @@ MonoBehaviour:
   typesNeededToPickRight: 0300000001000000
   rb: {fileID: 0}
   isMovable: 0
+  defaultColor: {r: 1, g: 1, b: 1, a: 1}
+  snapColor: {r: 0, g: 1, b: 0, a: 1}
 --- !u!65 &1135107117
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -6420,6 +6438,8 @@ MonoBehaviour:
   typesNeededToPickRight: 0300000001000000
   rb: {fileID: 0}
   isMovable: 0
+  defaultColor: {r: 1, g: 1, b: 1, a: 1}
+  snapColor: {r: 0, g: 1, b: 0, a: 1}
 --- !u!65 &1202355917
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -6876,7 +6896,7 @@ MonoBehaviour:
   forwardWallSensor: {fileID: 531615620}
   IsClimbing: 0
   turningAxis: 0
-  forwardIntersectDistance: 1
+  forwardIntersectDistance: 0.37
   speed: 2
 --- !u!4 &1351991386 stripped
 Transform:
@@ -7818,6 +7838,8 @@ MonoBehaviour:
   typesNeededToPickRight: 0300000001000000
   rb: {fileID: 0}
   isMovable: 0
+  defaultColor: {r: 1, g: 1, b: 1, a: 1}
+  snapColor: {r: 0, g: 1, b: 0, a: 1}
 --- !u!65 &1448854882
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -9208,6 +9230,8 @@ MonoBehaviour:
   typesNeededToPickRight: 0300000001000000
   rb: {fileID: 0}
   isMovable: 0
+  defaultColor: {r: 1, g: 1, b: 1, a: 1}
+  snapColor: {r: 0, g: 1, b: 0, a: 1}
 --- !u!65 &1758976711
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -9473,6 +9497,8 @@ MonoBehaviour:
   typesNeededToPickRight: 0300000001000000
   rb: {fileID: 0}
   isMovable: 0
+  defaultColor: {r: 1, g: 1, b: 1, a: 1}
+  snapColor: {r: 0, g: 1, b: 0, a: 1}
 --- !u!65 &1839163927
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -9595,6 +9621,8 @@ MonoBehaviour:
   typesNeededToPickRight: 0300000001000000
   rb: {fileID: 0}
   isMovable: 0
+  defaultColor: {r: 1, g: 1, b: 1, a: 1}
+  snapColor: {r: 0, g: 1, b: 0, a: 1}
 --- !u!65 &1845896951
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -9717,6 +9745,8 @@ MonoBehaviour:
   typesNeededToPickRight: 0300000001000000
   rb: {fileID: 0}
   isMovable: 0
+  defaultColor: {r: 1, g: 1, b: 1, a: 1}
+  snapColor: {r: 0, g: 1, b: 0, a: 1}
 --- !u!65 &1851165705
 BoxCollider:
   m_ObjectHideFlags: 0

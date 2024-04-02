@@ -25,6 +25,12 @@ namespace Character
 
         public float turningAxis = 0;
 
+        private void OnDrawGizmos()
+        {
+            Gizmos.color = Color.red;
+            Gizmos.DrawRay(forwardWallSensor.position, forwardWallSensor.up * forwardIntersectDistance);
+        }
+
         public void TurnRight()
         {
             turningAxis = 1f;
@@ -56,12 +62,12 @@ namespace Character
 
         public Vector3 GetForwardWithWalls()
         {
-            var ray = new Ray(forwardWallSensor.position, forwardWallSensor.forward);
+            var ray = new Ray(forwardWallSensor.position, forwardWallSensor.up);
             var hits = new RaycastHit[5];
             var hitCount = Physics.RaycastNonAlloc(ray, hits, forwardIntersectDistance, canStandLayers);
             if (hitCount > 0)
             {
-                Debug.DrawRay(forwardWallSensor.position, forwardWallSensor.forward * hits[0].distance);
+                Debug.DrawRay(forwardWallSensor.position, forwardWallSensor.up * hits[0].distance);
                 var minHit = hits[0];
                 for (int i = 1; i < hitCount; i++)
                 {
@@ -71,7 +77,7 @@ namespace Character
                     }
                 }
 
-                return Vector3.Project(forwardWallSensor.forward , Vector3.Cross(Vector3.up, minHit.normal).normalized);
+                return Vector3.Project(forwardWallSensor.up , Vector3.Cross(Vector3.up, minHit.normal).normalized);
             }
             else
             {

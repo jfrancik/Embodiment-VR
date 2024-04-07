@@ -6,6 +6,10 @@ public class CharacterLegs : MonoBehaviour
 {
     private Animator animator;
 
+
+    public Transform rightLegTarget;
+    public bool hasRightLegTarget;
+    
     [SerializeField]
     private float footOffset = 0;
 
@@ -24,6 +28,12 @@ public class CharacterLegs : MonoBehaviour
             Physics.Raycast(footPosition + Vector3.up, Vector3.down, out hit);
             animator.SetIKPositionWeight(foot, 1);
             animator.SetIKPosition(foot, hit.point + new Vector3(0, footOffset, 0));
+        }
+
+        if (hasRightLegTarget)
+        {
+            animator.SetIKPositionWeight(AvatarIKGoal.RightFoot, 1);
+            animator.SetIKPosition(AvatarIKGoal.RightFoot, rightLegTarget.position);
         }
     }
 }

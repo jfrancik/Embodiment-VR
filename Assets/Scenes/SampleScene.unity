@@ -2379,7 +2379,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3671890786779363153, guid: 60770bdb4dc667c45bea53db0339dc05, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3705146677043592845, guid: 60770bdb4dc667c45bea53db0339dc05, type: 3}
       propertyPath: m_Layer
@@ -3309,6 +3309,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   footOffset: 0.15
+  isClimbing: 0
+  climbLayers:
+    serializedVersion: 2
+    m_Bits: 1024
 --- !u!114 &531615627
 MonoBehaviour:
   m_ObjectHideFlags: 0

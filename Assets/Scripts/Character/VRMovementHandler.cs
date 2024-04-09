@@ -21,10 +21,19 @@ namespace Character
 
         private Vector3 _currentMovement;
 
-        public bool IsClimbing = false;
+        private bool _isClimbing = false;
 
         public float turningAxis = 0;
 
+        
+        public CharacterLegs characterLegs;
+
+
+        public void SetIsClimbing(bool value)
+        {
+            _isClimbing = value;
+            characterLegs.isClimbing = value;
+        }
         private void OnDrawGizmos()
         {
             Gizmos.color = Color.red;
@@ -118,7 +127,7 @@ namespace Character
 
         private void FixedUpdate()
         {
-            if(IsClimbing)
+            if(_isClimbing)
                 return;
             var vrHeadCurrentPos = vrHeadTransform.position;
             if (_isMovingForward)

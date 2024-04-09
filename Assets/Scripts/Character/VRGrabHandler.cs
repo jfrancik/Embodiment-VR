@@ -33,14 +33,10 @@ public class VRGrabHandler : MonoSingleton<VRGrabHandler>
 
     private void Update()
     {
-        if (_currentPickableLeft != null || _currentPickableRight != null)
-        {
-            movementHandler.IsClimbing = true;
-        }
-        else
-        {
-            movementHandler.IsClimbing = false;
-        }
+        var isClimbing = _currentPickableLeft != null || _currentPickableRight != null;
+        movementHandler.SetIsClimbing(isClimbing);
+       
+       
     }
 
     public void OnLeftHandOpenDeActive()

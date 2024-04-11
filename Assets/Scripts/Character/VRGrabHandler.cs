@@ -31,12 +31,30 @@ public class VRGrabHandler : MonoSingleton<VRGrabHandler>
     private bool _isLeftHandOpen;
     private bool _isRightHandOpen;
 
+    public float handReleaseThreshold = 1;
     private void Update()
     {
         var isClimbing = _currentPickableLeft != null || _currentPickableRight != null;
         movementHandler.SetIsClimbing(isClimbing);
-       
-       
+
+        if (_currentPickableLeft)
+        {
+            var isLeftAttached = _currentPickableLeft.IsAttached(handReleaseThreshold);
+            if (isLeftAttached)
+            {
+                _currentPickableLeft.Release();
+                _currentPickableLeft = null;
+            }
+        }
+        if (_currentPickableRight)
+        {
+            var isRightAttached = _currentPickableRight.IsAttached(handReleaseThreshold);
+            if (isRightAttached)
+            {
+                _currentPickableRight.Release();
+                _currentPickableRight = null;
+            }
+        }
     }
 
     public void OnLeftHandOpenDeActive()
@@ -88,7 +106,23 @@ public class VRGrabHandler : MonoSingleton<VRGrabHandler>
             ).Select(cp => cp.Value.Key.transform).ToList());
         }
     }
+    public bool IsPickableReleasedLeft(Pickable pickable)
+    {
+        return  _currentPickableLeft != null &&
+                pickable.typesNeededToPickLeft.Exists(type =>
+                    !(collidersPlacements.ContainsKey(type) &&
+                      collidersPlacements[type].Value.Equals(pickable))
+                );
+    }
 
+    public bool IsPickableReleasedRight(Pickable pickable)
+    {
+        return  _currentPickableRight != null &&
+                              pickable.typesNeededToPickRight.Exists(type =>
+                                  !(collidersPlacements.ContainsKey(type) &&
+                                  collidersPlacements[type].Value.Equals(pickable))
+                              );
+    }
     public bool IsPickablePickedRight(Pickable pickable)
     {
         var isRightPickable = !_isRightHandOpen && _currentPickableRight == null &&
@@ -115,8 +149,6 @@ public class VRGrabHandler : MonoSingleton<VRGrabHandler>
             return;
         var pickable = collidersPlacements[colliderType].Value;
         collidersPlacements.Remove(colliderType);
-        // if (!IsPickablePicked(pickable))
-        //     pickable.Release();
-        // PrintColliders();
+        
     }
 }

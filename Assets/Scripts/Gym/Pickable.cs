@@ -24,6 +24,11 @@ namespace Gym
             _meshRenderer = GetComponent<MeshRenderer>();
         }
 
+        public bool IsAttached(float threshold)
+        {
+            return (Vector3.Distance(transform.position, FindMedianOfFingers()) > threshold);
+
+        }
         private Vector3 FindMedianOfFingers()
         {
             var sum = Vector3.zero;

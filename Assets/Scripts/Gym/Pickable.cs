@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using DefaultNamespace;
+using OVRSimpleJSON;
 using UnityEngine;
 
 namespace Gym
@@ -7,79 +10,140 @@ namespace Gym
     public class Pickable : MonoBehaviour
     {
         private Vector3 _offset;
-        private List<Transform> _fingersTransforms = new List<Transform>();
-        private bool isSnapped = false;
+        private Dictionary<int, List<Transform>> _fingersTransforms = new Dictionary<int, List<Transform>>();
         public List<FingerColliderType> typesNeededToPickLeft;
         public List<FingerColliderType> typesNeededToPickRight;
         public Rigidbody rb;
         public bool isMovable = true;
-
+        private Dictionary<int, bool> _handSnapped = new Dictionary<int, bool>();
         public Color defaultColor = Color.white;
-        
+
         public Color snapColor = Color.green;
+
+        public Color bothSnapColor = Color.blue;
         private MeshRenderer _meshRenderer;
 
         private void Start()
         {
             _meshRenderer = GetComponent<MeshRenderer>();
+            _fingersTransforms.Add(0, null);
+            _fingersTransforms.Add(1, null);
+            _handSnapped.Add(0, false);
+            _handSnapped.Add(1, false);
         }
 
-        public bool IsAttached(float threshold)
+        public bool IsAttached(float threshold, int hand)
         {
-            return (Vector3.Distance(transform.position, FindMedianOfFingers()) > threshold);
-
+            var median = FindMedianOfFingers(hand);
+            return (Vector3.Distance(transform.position,median ) > threshold);
         }
-        private Vector3 FindMedianOfFingers()
+
+        private Vector3 FindMedianOfFingers(int hand)
         {
             var sum = Vector3.zero;
-            foreach (var ft in _fingersTransforms)
+            var count = 0;
+
+            foreach (var ft in _fingersTransforms[hand])
             {
                 sum += ft.position;
+                count++;
             }
-            return new Vector3(sum.x / _fingersTransforms.Count, sum.y / _fingersTransforms.Count,sum.z / _fingersTransforms.Count);
+
+            return new Vector3(sum.x / count, sum.y / count, sum.z / count);
         }
-        public void Release()
+
+        private Vector3 FindMedianOfFingers(bool debug = false)
         {
-            _meshRenderer.material.color = defaultColor;
-            if (isMovable)
+            var debugStr = "";
+            var sum = Vector3.zero;
+            var count = 0;
+            foreach (var handPair in _handSnapped)
             {
+                debugStr += " / " + handPair.Value;
+          
+                if (!handPair.Value)
+                    continue;
+           
+                foreach (var ft in _fingersTransforms[handPair.Key])
+                {
+                    sum += ft.position;
+                    count++;
+                }
                 
+                debugStr +=  " h:"+handPair.Key+ " c:" + _fingersTransforms[handPair.Key].Count;
+            }
+
+            if (debug)
+                Debug.LogError(count + debugStr);
+
+            return new Vector3(sum.x / count, sum.y / count, sum.z / count);
+        }
+
+        public bool IsSnapped()
+        {
+            return _handSnapped.Values.Any(sn => sn);
+        }
+
+        public void Release(int hand)
+        {
+            _handSnapped[hand] = false;
+
+            _fingersTransforms[hand] = null;
+            if (isMovable && !IsSnapped())
+            {
                 rb.isKinematic = false;
             }
 
-            isSnapped = false;
+            var lines = string.Join(Environment.NewLine,
+                _handSnapped.Select(kvp => kvp.Key + ": " + kvp.Value.ToString()));
+            Debug.LogError($"Hand {hand} released!\n {lines}");
+            _offset = transform.position - FindMedianOfFingers(true);
         }
-        public void SnapToHand(List<Transform> fingersTransforms)
+
+        public void SnapToHand(List<Transform> fingersTransforms, int hand)
         {
-            _meshRenderer.material.color = snapColor;
-            _fingersTransforms = fingersTransforms;
+            _handSnapped[hand] = true;
+            _fingersTransforms[hand] = fingersTransforms;
             if (isMovable)
             {
-                
                 rb.isKinematic = true;
             }
+
             // Debug.LogError( $"Count: {fingersTransforms.Count} / Median: " + FindMedianOfFingers() );
             _offset = transform.position - FindMedianOfFingers();
-            isSnapped = true;
         }
 
         private void Update()
         {
-            if (isSnapped)
+            if (IsSnapped())
             {
-                if(isMovable)
+                if (isMovable)
                     transform.position = FindMedianOfFingers() + _offset;
                 else
                 {
-                    var newPos = FindMedianOfFingers() + _offset;
-                    var movement = newPos - transform.position ;
+                    var median = FindMedianOfFingers();
+                    VRGizmos.Instance.DrawSphere(median, 0.03f, Color.magenta);
+                    // Debug.DrawRay(median , Vector3.up, Color.red);
+                    var newPos = median + _offset;
+                    var movement = newPos - transform.position;
+
                     GymEnv.Instance.MoveEnv(movement, gameObject.GetInstanceID());
                 }
+
+
+                _meshRenderer.material.color = snapColor;
+                if (_handSnapped.Values.All(v => v))
+                    _meshRenderer.material.color = bothSnapColor;
             }
-            else if(!isMovable)
+            else if (!isMovable)
             {
                 GymEnv.Instance.StopEnv(gameObject.GetInstanceID());
 
+                _meshRenderer.material.color = defaultColor;
+            }
+            else
+            {
+                _meshRenderer.material.color = defaultColor;
             }
         }
     }

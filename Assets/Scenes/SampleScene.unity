@@ -586,7 +586,7 @@ Rigidbody:
   m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 0
-  m_CollisionDetection: 0
+  m_CollisionDetection: 3
 --- !u!1 &98794350
 GameObject:
   m_ObjectHideFlags: 0
@@ -915,7 +915,7 @@ Rigidbody:
   m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 0
-  m_CollisionDetection: 0
+  m_CollisionDetection: 3
 --- !u!1 &217561576
 GameObject:
   m_ObjectHideFlags: 0
@@ -2213,7 +2213,7 @@ Rigidbody:
   m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 0
-  m_CollisionDetection: 0
+  m_CollisionDetection: 3
 --- !u!1001 &402348596
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5427,7 +5427,7 @@ Rigidbody:
   m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 0
-  m_CollisionDetection: 0
+  m_CollisionDetection: 3
 --- !u!114 &718098952
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5873,7 +5873,7 @@ Rigidbody:
   m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 0
-  m_CollisionDetection: 0
+  m_CollisionDetection: 3
 --- !u!114 &858992938
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5934,7 +5934,7 @@ Rigidbody:
   m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 0
-  m_CollisionDetection: 0
+  m_CollisionDetection: 3
 --- !u!114 &858992941
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6313,7 +6313,7 @@ Rigidbody:
   m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 0
-  m_CollisionDetection: 0
+  m_CollisionDetection: 3
 --- !u!114 &926365725
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9320,7 +9320,7 @@ Rigidbody:
   m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 0
-  m_CollisionDetection: 0
+  m_CollisionDetection: 3
 --- !u!1 &1419174810
 GameObject:
   m_ObjectHideFlags: 0
@@ -9779,7 +9779,7 @@ Rigidbody:
   m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 0
-  m_CollisionDetection: 0
+  m_CollisionDetection: 3
 --- !u!1 &1480283059
 GameObject:
   m_ObjectHideFlags: 0
@@ -12768,7 +12768,7 @@ Rigidbody:
   m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 0
-  m_CollisionDetection: 0
+  m_CollisionDetection: 3
 --- !u!114 &1976611816
 MonoBehaviour:
   m_ObjectHideFlags: 0

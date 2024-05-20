@@ -32,7 +32,7 @@ public class WalkingController : MonoBehaviour
         float previousX = animator.GetFloat("BlendX");
         float previousY = animator.GetFloat("BlendY");
 
-        animator.SetBool("IsWalking", localHeadSpeed.magnitude > speedMinimum);
+        // animator.SetBool("IsWalking", localHeadSpeed.magnitude > speedMinimum);
         animator.SetFloat("BlendX", Mathf.Lerp(previousX, Mathf.Clamp(localHeadSpeed.x, -1, 1), lerpFactor));
         animator.SetFloat("BlendY", Mathf.Lerp(previousY, Mathf.Clamp(localHeadSpeed.z, -1, 1), lerpFactor));
     }

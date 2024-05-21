@@ -37,7 +37,7 @@ public class CharacterLegs : MonoBehaviour
 
 
     [CanBeNull]
-    public Transform GetNearestFootPlacement(float range, LayerMask layerMask, AvatarIKGoal ikGoal)
+    public Vector3? GetNearestFootPlacement(float range, LayerMask layerMask, AvatarIKGoal ikGoal)
     {
         Vector3 footPosition =
             ikGoal == AvatarIKGoal.LeftFoot ? leftFootTransform.position : rightFootTransform.position;
@@ -60,7 +60,8 @@ public class CharacterLegs : MonoBehaviour
             }
         }
 
-        return minDistCollider.transform;
+
+        return minDistCollider.transform.position;
     }
 
     public void SetFootTarget(Transform target, AvatarIKGoal ikGoal)
@@ -79,6 +80,8 @@ public class CharacterLegs : MonoBehaviour
 
     private void Update()
     {
+        if (isClimbing)
+            return;
         UpdateLegAnchors();
     }
 
@@ -103,11 +106,21 @@ public class CharacterLegs : MonoBehaviour
         else
         {
             var nearestToLeft = GetNearestFootPlacement(footPlacementRange, climbLayers, AvatarIKGoal.LeftFoot);
-            if (nearestToLeft != null)
-                SetFootTarget(nearestToLeft, AvatarIKGoal.LeftFoot);
+            if (nearestToLeft.HasValue)
+            {
+                defaultLeftAnchor.position = Vector3.Lerp(defaultLeftAnchor.position, nearestToLeft.Value,
+                    Time.deltaTime * iKSmoothTime);
+
+                SetFootTarget(defaultLeftAnchor, AvatarIKGoal.LeftFoot);
+            }
+
             var nearestToRight = GetNearestFootPlacement(footPlacementRange, climbLayers, AvatarIKGoal.RightFoot);
-            if (nearestToRight != null)
-                SetFootTarget(nearestToRight, AvatarIKGoal.RightFoot);
+            if (nearestToRight.HasValue)
+            {
+                defaultRightAnchor.position = Vector3.Lerp(defaultRightAnchor.position, nearestToRight.Value,
+                    Time.deltaTime * iKSmoothTime);
+                SetFootTarget(defaultRightAnchor, AvatarIKGoal.RightFoot);
+            }
         }
 
         if (_hasRightLegTarget)
@@ -132,9 +145,7 @@ public class CharacterLegs : MonoBehaviour
 
     public Transform legBaseTransform;
     public float anchorDistanceSoftThreshold = 0.5f;
-    public float anchorDistanceThreshold;
     public float legOpenness = 0.2f;
-    public bool isCheckingSoft = true;
 
     public LegWalkState leftLegState = LegWalkState.STAY;
     public LegWalkState rightLegState = LegWalkState.STAY;
@@ -144,52 +155,65 @@ public class CharacterLegs : MonoBehaviour
     private Vector3 _rightNextAnchorPositionTarget;
     public float distanceInFront = 0.5f;
 
-    
-    
+
     //TODO: make thresholds based on speed of movement
     public void UpdateLegAnchors()
     {
         var leftLegBasePos = legBaseTransform.position + -legBaseTransform.right * legOpenness;
         var rightLegBasePos = legBaseTransform.position + legBaseTransform.right * legOpenness;
+        var leftDistVector = defaultLeftAnchor.position - leftLegBasePos;
+        var rightDistVector = defaultRightAnchor.position - rightLegBasePos;
         var leftNextAnchorPositionForward = leftLegBasePos + legBaseTransform.forward * distanceInFront;
         var rightNextAnchorPositionForward = rightLegBasePos + legBaseTransform.forward * distanceInFront;
         var leftNextAnchorPositionBackward = leftLegBasePos - legBaseTransform.forward * distanceInFront;
         var rightNextAnchorPositionBackward = rightLegBasePos - legBaseTransform.forward * distanceInFront;
-        var leftDistVector = defaultLeftAnchor.position - leftLegBasePos;
-        var rightDistVector = defaultRightAnchor.position - rightLegBasePos;
+
         var leftDist =
             Vector3.Distance(leftLegBasePos, defaultLeftAnchor.position);
         var rightDist = Vector3.Distance(rightLegBasePos, defaultRightAnchor.position);
 
-        if (leftDist > anchorDistanceSoftThreshold && leftLegState == LegWalkState.STAY &&
-            rightLegState == LegWalkState.STAY)
+        if (AreBothLegsBehind(leftDist, rightDist))
         {
-            if (Vector3.Dot(leftDistVector, defaultLeftAnchor.right) > 0)
-            {
-                _leftNextAnchorPositionTarget = leftNextAnchorPositionForward;
-            }
-            else
-            {
-                _leftNextAnchorPositionTarget = leftNextAnchorPositionBackward;
-            }
+            if (leftDist > rightDist)
+                MoveLeftLegAnchor(leftDistVector, leftNextAnchorPositionForward, leftNextAnchorPositionBackward);
 
-            leftLegState = LegWalkState.GOING_FORWARD;
-        }
-        else if (rightDist > anchorDistanceSoftThreshold && leftLegState == LegWalkState.STAY &&
-                 rightLegState == LegWalkState.STAY)
-        {
-            if (Vector3.Dot(rightDistVector, defaultRightAnchor.right) > 0)
-            {
-                _rightNextAnchorPositionTarget = rightNextAnchorPositionForward;
-            }
             else
-            {
-                _rightNextAnchorPositionTarget = rightNextAnchorPositionBackward;
-            }
-
-            rightLegState = LegWalkState.GOING_FORWARD;
+                MoveRightLegAnchor(rightDistVector, rightNextAnchorPositionForward, rightNextAnchorPositionBackward);
         }
 
+        else if (IsLeftLegBehind(leftDist))
+        {
+            MoveLeftLegAnchor(leftDistVector, leftNextAnchorPositionForward, leftNextAnchorPositionBackward);
+        }
+        else if (IsRightLegBehind(rightDist))
+        {
+            MoveRightLegAnchor(rightDistVector, rightNextAnchorPositionForward, rightNextAnchorPositionBackward);
+        }
+
+        CatchUpIKToAnchors();
+    }
+
+    private bool AreBothLegsBehind(float leftDist, float rightDist)
+    {
+        return leftDist > anchorDistanceSoftThreshold && rightDist > anchorDistanceSoftThreshold &&
+               leftLegState == LegWalkState.STAY &&
+               rightLegState == LegWalkState.STAY;
+    }
+
+    private bool IsRightLegBehind(float rightDist)
+    {
+        return rightDist > anchorDistanceSoftThreshold && leftLegState == LegWalkState.STAY &&
+               rightLegState == LegWalkState.STAY;
+    }
+
+    private bool IsLeftLegBehind(float leftDist)
+    {
+        return leftDist > anchorDistanceSoftThreshold && leftLegState == LegWalkState.STAY &&
+               rightLegState == LegWalkState.STAY;
+    }
+
+    private void CatchUpIKToAnchors()
+    {
         defaultLeftAnchor.position = Vector3.Lerp(defaultLeftAnchor.position, _leftNextAnchorPositionTarget,
             Time.deltaTime * iKSmoothTime);
         if (Vector3.Distance(defaultLeftAnchor.position, _leftNextAnchorPositionTarget) < 0.001f)
@@ -204,29 +228,36 @@ public class CharacterLegs : MonoBehaviour
         {
             rightLegState = LegWalkState.STAY;
         }
+    }
 
-        // if (leftDist> anchorDistanceSoftThreshold && isCheckingSoft)
-        // {
-        //     defaultLeftAnchor.position = leftNextAnchorPosition;
-        //     isCheckingSoft = false;
-        // }
-        // else if (rightDist > anchorDistanceSoftThreshold && isCheckingSoft)
-        // {
-        //     defaultRightAnchor.position = rightNextAnchorPosition;
-        //     isCheckingSoft = false;
-        // }
-        // if (leftDist> anchorDistanceThreshold)
-        // {
-        //     defaultLeftAnchor.position = leftNextAnchorPosition;
-        //     isCheckingSoft = true;
-        //
-        // }
-        // else if (rightDist > anchorDistanceThreshold)
-        // {
-        //     defaultRightAnchor.position = rightNextAnchorPosition;
-        //     isCheckingSoft = true;
-        //
-        // }
+    private void MoveRightLegAnchor(Vector3 rightDistVector, Vector3 rightNextAnchorPositionForward,
+        Vector3 rightNextAnchorPositionBackward)
+    {
+        if (Vector3.Dot(rightDistVector, defaultRightAnchor.right) > 0)
+        {
+            _rightNextAnchorPositionTarget = rightNextAnchorPositionForward;
+        }
+        else
+        {
+            _rightNextAnchorPositionTarget = rightNextAnchorPositionBackward;
+        }
+
+        rightLegState = LegWalkState.GOING_FORWARD;
+    }
+
+    private void MoveLeftLegAnchor(Vector3 leftDistVector, Vector3 leftNextAnchorPositionForward,
+        Vector3 leftNextAnchorPositionBackward)
+    {
+        if (Vector3.Dot(leftDistVector, defaultLeftAnchor.right) > 0)
+        {
+            _leftNextAnchorPositionTarget = leftNextAnchorPositionForward;
+        }
+        else
+        {
+            _leftNextAnchorPositionTarget = leftNextAnchorPositionBackward;
+        }
+
+        leftLegState = LegWalkState.GOING_FORWARD;
     }
 
     private void OnDrawGizmos()

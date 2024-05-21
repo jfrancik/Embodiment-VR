@@ -4283,13 +4283,11 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 768
   legBaseTransform: {fileID: 1440433729}
-  anchorDistanceSoftThreshold: 0.25
-  anchorDistanceThreshold: 0.3
+  anchorDistanceSoftThreshold: 0.38
   legOpenness: 0.15
-  isCheckingSoft: 1
   leftLegState: 0
   rightLegState: 0
-  distanceInFront: 0.2
+  distanceInFront: 0.3
 --- !u!114 &531615627
 MonoBehaviour:
   m_ObjectHideFlags: 0

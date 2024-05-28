@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Character;
 using JetBrains.Annotations;
 using UnityEngine;
 
@@ -144,7 +145,8 @@ public class CharacterLegs : MonoBehaviour
     }
 
     public Transform legBaseTransform;
-    public float anchorDistanceSoftThreshold = 0.5f;
+    public float defaultAnchorDistanceThreshold = 0.38f;
+    private float _currentAnchorDistanceThreshold = 0.38f;
     public float legOpenness = 0.2f;
 
     public LegWalkState leftLegState = LegWalkState.STAY;
@@ -153,20 +155,43 @@ public class CharacterLegs : MonoBehaviour
 
     private Vector3 _leftNextAnchorPositionTarget;
     private Vector3 _rightNextAnchorPositionTarget;
-    public float distanceInFront = 0.5f;
+    public float defaultDistanceInFront = 0.3f;
+    private float _currentDistanceInFront = 0.3f;
+
+    public float defaultSpeed = 0.25f;
+
+    public VRMovementHandler movementHandler;
+
+    public void UpdateLegWalkDistancesBySpeed()
+    {
+        var speed = movementHandler.VRHeadVelocity.magnitude;
+        var multiplier = speed / defaultSpeed;
+        if (multiplier > 1)
+        {
+            _currentAnchorDistanceThreshold = defaultAnchorDistanceThreshold * multiplier;
+            _currentDistanceInFront = defaultDistanceInFront * multiplier;
+        }
+        else
+        {
+            _currentAnchorDistanceThreshold = defaultAnchorDistanceThreshold;
+            _currentDistanceInFront = defaultDistanceInFront;
+        }
 
 
-    //TODO: make thresholds based on speed of movement
+        // print("SPEED: " + speed);
+    }
+
     public void UpdateLegAnchors()
     {
+        UpdateLegWalkDistancesBySpeed();
         var leftLegBasePos = legBaseTransform.position + -legBaseTransform.right * legOpenness;
         var rightLegBasePos = legBaseTransform.position + legBaseTransform.right * legOpenness;
         var leftDistVector = defaultLeftAnchor.position - leftLegBasePos;
         var rightDistVector = defaultRightAnchor.position - rightLegBasePos;
-        var leftNextAnchorPositionForward = leftLegBasePos + legBaseTransform.forward * distanceInFront;
-        var rightNextAnchorPositionForward = rightLegBasePos + legBaseTransform.forward * distanceInFront;
-        var leftNextAnchorPositionBackward = leftLegBasePos - legBaseTransform.forward * distanceInFront;
-        var rightNextAnchorPositionBackward = rightLegBasePos - legBaseTransform.forward * distanceInFront;
+        var leftNextAnchorPositionForward = leftLegBasePos + legBaseTransform.forward * _currentDistanceInFront;
+        var rightNextAnchorPositionForward = rightLegBasePos + legBaseTransform.forward * _currentDistanceInFront;
+        var leftNextAnchorPositionBackward = leftLegBasePos - legBaseTransform.forward * _currentDistanceInFront;
+        var rightNextAnchorPositionBackward = rightLegBasePos - legBaseTransform.forward * _currentDistanceInFront;
 
         var leftDist =
             Vector3.Distance(leftLegBasePos, defaultLeftAnchor.position);
@@ -195,20 +220,20 @@ public class CharacterLegs : MonoBehaviour
 
     private bool AreBothLegsBehind(float leftDist, float rightDist)
     {
-        return leftDist > anchorDistanceSoftThreshold && rightDist > anchorDistanceSoftThreshold &&
+        return leftDist > _currentAnchorDistanceThreshold && rightDist > _currentAnchorDistanceThreshold &&
                leftLegState == LegWalkState.STAY &&
                rightLegState == LegWalkState.STAY;
     }
 
     private bool IsRightLegBehind(float rightDist)
     {
-        return rightDist > anchorDistanceSoftThreshold && leftLegState == LegWalkState.STAY &&
+        return rightDist > _currentAnchorDistanceThreshold && leftLegState == LegWalkState.STAY &&
                rightLegState == LegWalkState.STAY;
     }
 
     private bool IsLeftLegBehind(float leftDist)
     {
-        return leftDist > anchorDistanceSoftThreshold && leftLegState == LegWalkState.STAY &&
+        return leftDist > _currentAnchorDistanceThreshold && leftLegState == LegWalkState.STAY &&
                rightLegState == LegWalkState.STAY;
     }
 
@@ -233,7 +258,7 @@ public class CharacterLegs : MonoBehaviour
     private void MoveRightLegAnchor(Vector3 rightDistVector, Vector3 rightNextAnchorPositionForward,
         Vector3 rightNextAnchorPositionBackward)
     {
-        if (Vector3.Dot(rightDistVector, defaultRightAnchor.right) > 0)
+        if (Vector3.Dot(rightDistVector, legBaseTransform.forward) < 0)
         {
             _rightNextAnchorPositionTarget = rightNextAnchorPositionForward;
         }
@@ -248,7 +273,7 @@ public class CharacterLegs : MonoBehaviour
     private void MoveLeftLegAnchor(Vector3 leftDistVector, Vector3 leftNextAnchorPositionForward,
         Vector3 leftNextAnchorPositionBackward)
     {
-        if (Vector3.Dot(leftDistVector, defaultLeftAnchor.right) > 0)
+        if (Vector3.Dot(leftDistVector, legBaseTransform.forward) < 0)
         {
             _leftNextAnchorPositionTarget = leftNextAnchorPositionForward;
         }

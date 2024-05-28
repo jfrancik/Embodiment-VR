@@ -3343,7 +3343,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3705146677043592845, guid: 60770bdb4dc667c45bea53db0339dc05, type: 3}
       propertyPath: m_Layer
-      value: 7
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 3705146677043592845, guid: 60770bdb4dc667c45bea53db0339dc05, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3721571313622080408, guid: 60770bdb4dc667c45bea53db0339dc05, type: 3}
       propertyPath: m_AABB.m_Center.x
@@ -4283,11 +4287,13 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 768
   legBaseTransform: {fileID: 1440433729}
-  anchorDistanceSoftThreshold: 0.38
+  defaultAnchorDistanceThreshold: 0.3
   legOpenness: 0.15
   leftLegState: 0
   rightLegState: 0
-  distanceInFront: 0.3
+  defaultDistanceInFront: 0.28
+  defaultSpeed: 0.2
+  movementHandler: {fileID: 1325901665}
 --- !u!114 &531615627
 MonoBehaviour:
   m_ObjectHideFlags: 0

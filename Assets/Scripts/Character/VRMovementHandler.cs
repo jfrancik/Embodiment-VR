@@ -127,6 +127,7 @@ namespace Character
 
         private void FixedUpdate()
         {
+            UpdateVelocity();
             if(_isClimbing)
                 return;
             var vrHeadCurrentPos = vrHeadTransform.position;
@@ -154,6 +155,17 @@ namespace Character
             {
                 vrHeadTransform.Rotate(Vector3.up, turningAxis * Time.fixedDeltaTime * 45);
             }
+        }
+        
+        
+        
+        public Vector3 VRHeadVelocity { get; private set; }
+        private Vector3 _posInLastFrame;
+        private void UpdateVelocity()
+        {
+            var posInCurrentFrame = transform.position;
+            VRHeadVelocity = (posInCurrentFrame - _posInLastFrame) / Time.fixedDeltaTime;
+            _posInLastFrame = posInCurrentFrame;
         }
     }
 }
